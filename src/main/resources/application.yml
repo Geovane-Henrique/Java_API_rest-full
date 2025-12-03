@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: pessoa
+  datasource:
+    url: jdbc:mysql://localhost:3306/pessoa
+    username: root
+    password: BERSERK87
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+
+  server:
+    port: 8080
+
