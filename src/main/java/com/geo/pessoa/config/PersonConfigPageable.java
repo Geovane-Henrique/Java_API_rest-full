@@ -42,24 +42,24 @@ public class PersonConfigPageable implements RepresentationModelAssembler<Person
 
         PagedModel<EntityModel<PersonDTO>> model = PagedModel.of(content,metadata);
 
-        String nUrl = url.replace("sort=FirstName,asc","");
+
 
 
         model.add(linkTo(PersonController.class).slash("").withRel("findAll").withType("GET"));
-        model.add(linkTo(PersonController.class).slash(nUrl + "sort=FirstName,asc").withRel("find").withType("GET"));
+        model.add(linkTo(PersonController.class).slash(url + "?sort=FirstName,asc").withRel("find").withType("GET"));
 
 
         System.out.println("param =" + param);
-        System.out.println("nUrl =" + nUrl);
+        System.out.println("nUrl =" + url);
 
 
         if(page.hasPrevious()){
             int prev = page.getNumber() - 1;
-            model.add(linkTo(PersonController.class).slash(nUrl +"?page=" + prev + param).withRel("prev"));
+            model.add(linkTo(PersonController.class).slash(url +"?page=" + prev + param).withRel("prev"));
         }
         if(page.hasNext()){
            int next = page.getNumber() + 1;
-           model.add(linkTo(PersonController.class).slash(nUrl +"?page=" + next + param).withRel("next"));
+           model.add(linkTo(PersonController.class).slash(url + "?page=" + next + param).withRel("next"));
         }
 
 

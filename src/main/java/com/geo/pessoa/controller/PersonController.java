@@ -38,7 +38,7 @@ public class PersonController {
 
         var page =  service.findAll(pageable);
 
-        String url = linkBuilder.buildUrl(request,"");
+        String url = "";
         String param = linkBuilder.buildParam(request);
         return model.pagedModel(pageable,page, url, param);
     }
@@ -68,7 +68,7 @@ public class PersonController {
     public PagedModel<EntityModel<PersonDTO>> findByNameStarEnd(@RequestParam() String start, @RequestParam String end, @PageableDefault(size = 4) Pageable pageable, HttpServletRequest request)
     {
         var page = service.findByNomeStartingWithIgnoreCaseAndNomeEndingWithIgnoreCase(pageable , start , end);
-        String url = linkBuilder.buildUrl(request,"/filtro/nome/start-end");
+        String url = "/filtro/nome/start-end";
         String param = linkBuilder.buildParam(request);
         return model.pagedModel(pageable,page,url ,param);
     }
