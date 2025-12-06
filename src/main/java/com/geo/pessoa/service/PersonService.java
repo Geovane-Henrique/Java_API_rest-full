@@ -36,22 +36,18 @@ public class PersonService {
     }
 
     public Page<PersonDTO> findAll(Pageable pageable){
-        var entities = repository.findAll(pageable);
-        var dtos = entities.map(mapper::toDTO);
 
-        return dtos;
+        return repository.findAll(pageable)
+                .map(mapper::toDTO);
+//
     }
 
     public PersonDTO create(PersonDTO dto){
 
-        System.out.println(dto.getCpf());
         var entity = mapper.toEntity(dto);
-        System.out.println(entity.getCpf());
 
         var entitySaved = repository.save(entity);
         var dtor = mapper.toDTO(entitySaved);
-
-
 
         addLink(dtor);
 
@@ -84,6 +80,17 @@ public class PersonService {
     public Page<PersonDTO> findByNomeStartingWithIgnoreCaseAndNomeEndingWithIgnoreCase(Pageable pageable,String start,String end){
 
         return repository.findByFirstNameStartingWithIgnoreCaseAndFirstNameEndingWithIgnoreCase(start ,end ,pageable)
+                .map(mapper::toDTO);
+    }
+
+    public Page<PersonDTO> findByFirstNameStartWithIgnoreCase(String start, Pageable pageable){
+
+        return repository.findByFirstNameStartingWithIgnoreCase(start ,pageable)
+                .map(mapper::toDTO);
+    }
+
+    public Page<PersonDTO> findByFirstNameEndingWithIgnoreCase(String end,Pageable pageable){
+        return repository.findByFirstNameEndingWithIgnoreCase(end,pageable)
                 .map(mapper::toDTO);
     }
 

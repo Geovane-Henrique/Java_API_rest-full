@@ -9,5 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PersonRepository extends JpaRepository<Person,Long> {
 
     Page<Person> findByFirstNameStartingWithIgnoreCaseAndFirstNameEndingWithIgnoreCase(String start,String end, Pageable pageable);
-//    Page<Person> findByAge
+
+    Page<Person> findByFirstNameStartingWithIgnoreCase(String start,Pageable pageable);
+
+    Page<Person> findByFirstNameEndingWithIgnoreCase(String end,Pageable pageable);
 }
+
+
+
+
