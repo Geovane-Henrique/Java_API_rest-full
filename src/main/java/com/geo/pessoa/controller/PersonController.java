@@ -1,7 +1,9 @@
 package com.geo.pessoa.controller;
 
 import com.geo.pessoa.config.PersonConfigPageable;
+import com.geo.pessoa.controller.urlBuilder.PageLinkBuilder;
 import com.geo.pessoa.dto.PersonDTO;
+import com.geo.pessoa.dto.PersonFilter;
 import com.geo.pessoa.service.PersonService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,7 +27,7 @@ public class PersonController {
     @Autowired
     PersonConfigPageable model;
 
-//    PageLinkBuilder linkBuilder = new PageLinkBuilder();
+    PageLinkBuilder linkBuilder = new PageLinkBuilder();
 
     //http://localhost:8080/pessoa/1
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,11 +37,11 @@ public class PersonController {
 
     //http://localhost:8080/pessoa
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagedModel<EntityModel<PersonDTO>> findAll(@PageableDefault(size = 4) Pageable pageable){
-
-        var page = service.findAll(pageable);
-
-        return model.pagedModel(pageable,page);
+    public PagedModel<EntityModel<PersonDTO>> findAll(@PageableDefault(size = 4) Pageable pageable,
+                                                      HttpServletRequest request,
+                                                      PersonFilter filter){
+        var page = service.filter(pageable,filter);
+        return model.pagedModel(pageable,page,"",linkBuilder.buildParam(request.getQueryString()));
     }
     //http://localhost:8080/pessoa/create
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE ,
@@ -62,29 +64,6 @@ public class PersonController {
            return ResponseEntity.noContent().build();
 
     }
-
-    //filtros
-
-    //http://localhost:8080/pessoa/filtro/nome/start-end?start=g&end=e
-    @GetMapping(value = "/filtro/nome/start-end",produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagedModel<EntityModel<PersonDTO>> findByFirstNameStarEnd(@RequestParam() String start, @RequestParam String end, @PageableDefault(size = 4) Pageable pageable)
-    {
-        var page = service.findByNomeStartingWithIgnoreCaseAndNomeEndingWithIgnoreCase(pageable , start , end);
-        return model.pagedModel(pageable,page);
-    }
-    //http://localhost:8080/pessoa/filtro/nome/start?start=g
-    @GetMapping(value = "/filtro/nome/start", produces = MediaType.APPLICATION_JSON_VALUE)
-        public PagedModel<EntityModel<PersonDTO>> findByFirstNameStart(@PageableDefault(size = 4)Pageable pageable, @RequestParam String start ){
-        var page = service.findByFirstNameStartWithIgnoreCase(start,pageable);
-        return model.pagedModel(pageable,page);
-    }
-
-    @GetMapping(value = "/filtro/nome/end", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagedModel<EntityModel<PersonDTO>> findByFirstNameEnd(@PageableDefault(size = 4) Pageable pageable, @RequestParam String end){
-        var page = service.findByFirstNameEndingWithIgnoreCase(end,pageable);
-        return model.pagedModel(pageable,page);
-    }
-
 
     }
 

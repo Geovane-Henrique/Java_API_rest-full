@@ -2,13 +2,16 @@ package com.geo.pessoa.service;
 
 import com.geo.pessoa.controller.PersonController;
 import com.geo.pessoa.dto.PersonDTO;
+import com.geo.pessoa.dto.PersonFilter;
 import com.geo.pessoa.exception.NotFoundException;
 import com.geo.pessoa.mapper.PersonMapper;
 import com.geo.pessoa.model.Person;
 import com.geo.pessoa.repository.PersonRepository;
+import com.geo.pessoa.service.spec.PersonSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -25,6 +28,9 @@ public class PersonService {
     @Autowired
     PersonRepository repository;
 
+    @Autowired
+    PersonSpec personSpec;
+
     public PersonDTO findById(Long id){
         var entity = repository.findById(id).
                 orElseThrow(()-> new NotFoundException("pessoa não encontrada"));
@@ -33,13 +39,6 @@ public class PersonService {
 
         addLink(dto);
         return dto;
-    }
-
-    public Page<PersonDTO> findAll(Pageable pageable){
-
-        return repository.findAll(pageable)
-                .map(mapper::toDTO);
-//
     }
 
     public PersonDTO create(PersonDTO dto){
@@ -77,23 +76,39 @@ public class PersonService {
         repository.delete(entity);
     }
 
-    public Page<PersonDTO> findByNomeStartingWithIgnoreCaseAndNomeEndingWithIgnoreCase(Pageable pageable,String start,String end){
 
-        return repository.findByFirstNameStartingWithIgnoreCaseAndFirstNameEndingWithIgnoreCase(start ,end ,pageable)
-                .map(mapper::toDTO);
+    public Page<PersonDTO> filter(Pageable pageable, PersonFilter filter){
+
+        Specification<Person> spec = (root, query, cb) -> cb.conjunction();
+
+        if (filter.getStartName() != null){
+           spec = spec.and(personSpec.firstNameStart(filter.getStartName()));
+        }
+
+        if (filter.getEndName() != null){
+            spec = spec.and(personSpec.firstNameEnd(filter.getEndName()));
+        }
+
+        if (filter.getContainName() != null){
+            spec = spec.and(personSpec.firstNameContains(filter.getContainName()));
+        }
+
+        if (filter.getGender() != null){
+            spec = spec.and(personSpec.gender(filter.getGender()));
+        }
+
+        if (filter.getMaxAge() != null){
+            spec = spec.and(personSpec.LessAge(filter.getMaxAge()));
+        }
+
+        if (filter.getMinAge() != null){
+            spec = spec.and(personSpec.greaterAge(filter.getMinAge()));
+        }
+
+        return repository.findAll(spec,pageable).
+                map(mapper::toDTO);
+
     }
-
-    public Page<PersonDTO> findByFirstNameStartWithIgnoreCase(String start, Pageable pageable){
-
-        return repository.findByFirstNameStartingWithIgnoreCase(start ,pageable)
-                .map(mapper::toDTO);
-    }
-
-    public Page<PersonDTO> findByFirstNameEndingWithIgnoreCase(String end,Pageable pageable){
-        return repository.findByFirstNameEndingWithIgnoreCase(end,pageable)
-                .map(mapper::toDTO);
-    }
-
 
        public void addLink(PersonDTO dto){
         dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withRel("GET"));

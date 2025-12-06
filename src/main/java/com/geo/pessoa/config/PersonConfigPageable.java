@@ -25,7 +25,7 @@ public class PersonConfigPageable implements RepresentationModelAssembler<Person
                linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
     }
 
-    public PagedModel<EntityModel<PersonDTO>> pagedModel(Pageable pageable, Page<PersonDTO> page){
+    public PagedModel<EntityModel<PersonDTO>> pagedModel(Pageable pageable, Page<PersonDTO> page, String url, String param){
 
         List<EntityModel<PersonDTO>> content = page.getContent().stream()
                 .map(this::toModel)
@@ -46,18 +46,18 @@ public class PersonConfigPageable implements RepresentationModelAssembler<Person
 
 
         model.add(linkTo(PersonController.class).slash("").withRel("findAll").withType("GET"));
-//        model.add(linkTo(PersonController.class).slash(url + "?sort=FirstName,asc" + param).withRel("find").withType("GET"));
+//
 
 
-
+          System.out.println(param);
 
         if(page.hasPrevious()){
             int prev = page.getNumber() - 1;
-            model.add(linkTo(PersonController.class).slash( "?page=" + prev ).withRel("prev"));
+            model.add(linkTo(PersonController.class).slash( url+"?page=" + prev + param).withRel("prev"));
         }
         if(page.hasNext()){
            int next = page.getNumber() + 1;
-           model.add(linkTo(PersonController.class).slash(  "?page=" + next ).withRel("next"));
+           model.add(linkTo(PersonController.class).slash( url+ "?page=" + next + param).withRel("next"));
         }
 
 
